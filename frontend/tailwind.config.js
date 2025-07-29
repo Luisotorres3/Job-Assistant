@@ -3,7 +3,9 @@ export default {
   content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
-      // Si necesitas agregar colores personalizados, hazlo aquí
+      colors: {
+        primary: '#3b82f6',
+      },
     },
   },
   plugins: [],
