@@ -3,19 +3,23 @@ import { NavLink } from "react-router-dom";
 export default function Navbar() {
   return (
     <header className="bg-white/90 backdrop-blur shadow-md sticky top-0 z-30">
-      <nav className="container mx-auto px-6 py-5 flex flex-col items-center">
-        <NavLink to="/" className="flex flex-col items-center gap-2 mb-2 select-none">
-          <span className="inline-block bg-primary text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg text-3xl">🧑‍💼</span>
-          <span className="text-4xl font-extrabold tracking-tight text-primary drop-shadow-lg text-center leading-tight">Job Assistant</span>
+      <nav className="container mx-auto px-6 py-4 flex flex-wrap justify-between items-center">
+        <NavLink to="/" className="flex items-center gap-3 select-none">
+          <span className="inline-block bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg text-2xl">
+            🧑‍💼
+          </span>
+          <span className="text-2xl font-bold tracking-tight text-primary">
+            Job Assistant
+          </span>
         </NavLink>
-        <div className="flex items-center gap-4 mt-2">
+        <div className="flex items-center gap-2 mt-4 sm:mt-0">
           <NavLink
             to="/"
             className={({ isActive }) =>
-              `px-6 py-3 rounded-xl text-lg font-bold transition-all duration-200 border-2 ${
+              `px-4 py-2 rounded-lg text-base font-semibold transition-colors duration-200 ${
                 isActive
-                  ? "bg-primary border-primary text-white shadow-lg"
-                  : "border-transparent text-primary hover:bg-primary/10 hover:border-primary"
+                  ? "bg-primary text-white shadow-md"
+                  : "text-primary hover:bg-primary/10"
               }`
             }
           >
@@ -24,10 +28,10 @@ export default function Navbar() {
           <NavLink
             to="/new"
             className={({ isActive }) =>
-              `px-6 py-3 rounded-xl text-lg font-bold transition-all duration-200 border-2 ${
+              `px-4 py-2 rounded-lg text-base font-semibold transition-colors duration-200 ${
                 isActive
-                  ? "bg-primary border-primary text-white shadow-lg"
-                  : "border-transparent text-primary hover:bg-primary/10 hover:border-primary"
+                  ? "bg-primary text-white shadow-md"
+                  : "text-primary hover:bg-primary/10"
               }`
             }
           >

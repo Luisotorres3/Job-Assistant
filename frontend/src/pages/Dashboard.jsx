@@ -17,22 +17,33 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
+    <div className="space-y-8">
+      <div className="flex flex-wrap justify-between items-center gap-4">
+        <h1 className="text-4xl font-extrabold text-gray-800 tracking-tight">
+          Dashboard
+        </h1>
         <Link
           to="/new"
-          className="bg-primary text-white px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 transition-colors"
+          className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-primary hover:bg-blue-700 shadow-md transition-colors"
         >
-          + New Application
+          + Add New Application
         </Link>
       </div>
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-white rounded-xl shadow-lg p-6">
         {loading && (
-          <div className="text-center py-8 text-gray-500">Loading...</div>
+          <div className="text-center py-10 text-gray-500 font-medium">
+            Loading Applications...
+          </div>
         )}
-        {error && <div className="text-center text-red-500 py-8">{error}</div>}
-        {!loading && !error && <ApplicationTable applications={applications} />}
+        {error && (
+          <div className="text-center py-10 text-red-600 bg-red-50 rounded-lg">
+            <p className="font-bold">Error</p>
+            <p>{error}</p>
+          </div>
+        )}
+        {!loading && !error && (
+          <ApplicationTable applications={applications} />
+        )}
       </div>
     </div>
   );
