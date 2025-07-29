@@ -5,9 +5,9 @@ import Navbar from "./components/Navbar";
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-white to-primary/5 text-gray-800">
+    <div className="min-h-screen bg-gray-50 text-gray-800">
       <Navbar />
-      <main className="container mx-auto px-6 py-8">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/new" element={<NewApplication />} />
