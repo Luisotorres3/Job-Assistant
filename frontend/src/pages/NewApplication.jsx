@@ -22,13 +22,15 @@ export default function NewApplication() {
   }
 
   return (
-    <section className="bg-white rounded shadow p-6 max-w-lg mx-auto">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800">New Application</h1>
-      <ApplicationForm
-        onSubmit={handleSubmit}
-        loading={loading}
-        error={error}
-      />
-    </section>
+    <div>
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">New Application</h1>
+      <div className="bg-white rounded-lg shadow-md p-6 max-w-lg mx-auto">
+        <ApplicationForm
+          onSubmit={handleSubmit}
+          loading={loading}
+          error={error}
+        />
+      </div>
+    </div>
   );
 }

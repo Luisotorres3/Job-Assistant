@@ -17,21 +17,23 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <section className="bg-white rounded shadow p-6">
+    <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Job Applications</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
         <Link
           to="/new"
-          className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition"
+          className="bg-primary text-white px-4 py-2 rounded-md shadow-sm hover:bg-blue-700 transition-colors"
         >
-          + New
+          + New Application
         </Link>
       </div>
-      {loading && (
-        <div className="text-center py-8 text-gray-500">Loading...</div>
-      )}
-      {error && <div className="text-center text-red-500 py-8">{error}</div>}
-      {!loading && !error && <ApplicationTable applications={applications} />}
-    </section>
+      <div className="bg-white rounded-lg shadow-md p-6">
+        {loading && (
+          <div className="text-center py-8 text-gray-500">Loading...</div>
+        )}
+        {error && <div className="text-center text-red-500 py-8">{error}</div>}
+        {!loading && !error && <ApplicationTable applications={applications} />}
+      </div>
+    </div>
   );
 }
