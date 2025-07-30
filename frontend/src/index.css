@@ -52,9 +52,120 @@
     border-color: hsl(var(--border));
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
     font-feature-settings: "rlig" 1, "calt" 1;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: theme("colors.gray.100");
+  }
+
+  .dark ::-webkit-scrollbar-track {
+    background: theme("colors.gray.800");
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: theme("colors.gray.300");
+    border-radius: 4px;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: theme("colors.gray.600");
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: theme("colors.gray.400");
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: theme("colors.gray.500");
+  }
+
+  /* Focus styles */
+  .focus-visible {
+    outline: 2px solid theme("colors.blue.500");
+    outline-offset: 2px;
+  }
+
+  /* Selection styles */
+  ::selection {
+    background-color: theme("colors.blue.200");
+    color: theme("colors.blue.900");
+  }
+
+  .dark ::selection {
+    background-color: theme("colors.blue.800");
+    color: theme("colors.blue.100");
+  }
+}
+
+@layer components {
+  /* Utility classes for consistent styling */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg shadow-lg hover:from-blue-700 hover:to-purple-700 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 transition-all duration-200;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-900 transition-all duration-200;
+  }
+
+  .card {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-colors duration-300;
+  }
+
+  .card-hover {
+    @apply card hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200;
+  }
+
+  /* Animation classes */
+  .animate-in {
+    animation-fill-mode: both;
+  }
+
+  .slide-in-from-top-2 {
+    animation-name: slideInFromTop;
+    --tw-enter-translate-y: -0.5rem;
+  }
+
+  .duration-300 {
+    animation-duration: 300ms;
+  }
+}
+
+@layer utilities {
+  /* Custom utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .bg-gradient-primary {
+    background: linear-gradient(
+      135deg,
+      theme("colors.blue.600"),
+      theme("colors.purple.600")
+    );
+  }
+
+  .bg-gradient-primary-hover {
+    background: linear-gradient(
+      135deg,
+      theme("colors.blue.700"),
+      theme("colors.purple.700")
+    );
   }
 }
