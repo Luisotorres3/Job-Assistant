@@ -108,23 +108,32 @@ export default function ApplicationTable({
                 </div>
               </td>
               <td className="px-6 py-4">
-                <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <div className="flex items-center space-x-2">
                   <button
-                    className="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all duration-200"
+                    className="p-2 rounded-lg transition-all duration-200
+                      text-blue-600 bg-blue-50 hover:bg-blue-100
+                      dark:text-blue-400 dark:bg-blue-900/30 dark:hover:bg-blue-900/60
+                      focus:outline-none focus:ring-2 focus:ring-blue-400"
                     title="View details"
                     onClick={() => onView && onView(app)}
                   >
                     <Eye size={16} />
                   </button>
                   <button
-                    className="p-2 text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded-lg transition-all duration-200"
+                    className="p-2 rounded-lg transition-all duration-200
+                      text-yellow-600 bg-yellow-50 hover:bg-yellow-100
+                      dark:text-yellow-400 dark:bg-yellow-900/30 dark:hover:bg-yellow-900/60
+                      focus:outline-none focus:ring-2 focus:ring-yellow-400"
                     title="Edit application"
                     onClick={() => onEdit && onEdit(app)}
                   >
                     <Edit size={16} />
                   </button>
                   <button
-                    className="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200"
+                    className="p-2 rounded-lg transition-all duration-200
+                      text-red-600 bg-red-50 hover:bg-red-100
+                      dark:text-red-400 dark:bg-red-900/30 dark:hover:bg-red-900/60
+                      focus:outline-none focus:ring-2 focus:ring-red-400"
                     title="Delete application"
                     onClick={() => onDelete && onDelete(app)}
                   >

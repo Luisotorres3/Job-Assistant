@@ -35,24 +35,24 @@ export default function NewApplication() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 bg-background text-foreground p-6 rounded-2xl shadow-lg border border-border max-w-2xl mx-auto mt-10">
       {/* Header */}
       <div className="flex items-center gap-4">
         <button
           onClick={() => navigate(-1)}
-          className="p-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 group"
+          className="p-3 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-zinc-700 dark:hover:bg-zinc-600 transition-colors duration-200 group border border-border"
           aria-label="Go back"
         >
           <ArrowLeft
             size={24}
-            className="text-gray-600 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white"
+            className="text-foreground group-hover:text-gray-900 dark:group-hover:text-white"
           />
         </button>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-foreground">
             New Application
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-muted-foreground mt-1">
             Add a new job application to track your progress
           </p>
         </div>
