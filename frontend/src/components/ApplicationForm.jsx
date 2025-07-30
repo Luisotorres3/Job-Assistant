@@ -13,7 +13,7 @@ export default function ApplicationForm({ onSubmit, loading, error }) {
     role: "",
     location: "",
     status: "applied",
-    date_applied: "",
+    date_applied: new Date().toISOString().split("T")[0],
   });
 
   function handleChange(e) {
@@ -26,11 +26,11 @@ export default function ApplicationForm({ onSubmit, loading, error }) {
   }
 
   const inputStyles =
-    "mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm transition-shadow";
+    "mt-1 block w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm transition-all duration-200";
 
   return (
-    <div className="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg">
-      <h2 className="text-3xl font-extrabold text-gray-800 mb-6 tracking-tight">
+    <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
+      <h2 className="text-3xl font-extrabold text-gray-800 dark:text-white mb-6 tracking-tight">
         Add New Application
       </h2>
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -38,7 +38,7 @@ export default function ApplicationForm({ onSubmit, loading, error }) {
           <div>
             <label
               htmlFor="company"
-              className="block text-sm font-semibold text-gray-600"
+              className="block text-sm font-semibold text-gray-600 dark:text-gray-300"
             >
               Company
             </label>
@@ -56,7 +56,7 @@ export default function ApplicationForm({ onSubmit, loading, error }) {
           <div>
             <label
               htmlFor="role"
-              className="block text-sm font-semibold text-gray-600"
+              className="block text-sm font-semibold text-gray-600 dark:text-gray-300"
             >
               Role
             </label>
@@ -75,7 +75,7 @@ export default function ApplicationForm({ onSubmit, loading, error }) {
         <div>
           <label
             htmlFor="location"
-            className="block text-sm font-semibold text-gray-600"
+            className="block text-sm font-semibold text-gray-600 dark:text-gray-300"
           >
             Location
           </label>
@@ -94,7 +94,7 @@ export default function ApplicationForm({ onSubmit, loading, error }) {
           <div>
             <label
               htmlFor="status"
-              className="block text-sm font-semibold text-gray-600"
+              className="block text-sm font-semibold text-gray-600 dark:text-gray-300"
             >
               Status
             </label>
@@ -115,7 +115,7 @@ export default function ApplicationForm({ onSubmit, loading, error }) {
           <div>
             <label
               htmlFor="date_applied"
-              className="block text-sm font-semibold text-gray-600"
+              className="block text-sm font-semibold text-gray-600 dark:text-gray-300"
             >
               Date Applied
             </label>
@@ -139,7 +139,7 @@ export default function ApplicationForm({ onSubmit, loading, error }) {
         <button
           type="submit"
           disabled={loading}
-          className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-base font-semibold text-white bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+          className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-base font-semibold text-white bg-primary hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-focus disabled:opacity-60 disabled:cursor-not-allowed transition-all"
         >
           {loading ? "Submitting..." : "Submit Application"}
         </button>
