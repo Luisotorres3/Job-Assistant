@@ -2,7 +2,7 @@ import React from 'react';
 
 const StatCard = ({ icon: Icon, title, value, color }) => (
   <div
-    className="bg-card text-card-foreground border rounded-xl shadow p-6 transition-all duration-300 hover:shadow-md"
+    className="bg-card text-card-foreground border rounded-xl shadow p-6 transition-all duration-300 hover:shadow-lg hover:scale-105"
   >
     <div className="flex items-center">
       <div className={`p-3 rounded-lg ${color} shadow-sm`}>

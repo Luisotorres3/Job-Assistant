@@ -31,7 +31,14 @@ export default function ApplicationForm({
     date_applied:
       initialData.date_applied || new Date().toISOString().split("T")[0],
     notes: initialData.notes || "",
+    tags: initialData.tags || [],
   });
+
+  function handleTagsChange(e) {
+    // Assuming tags are comma-separated
+    const tagsArray = e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag);
+    setForm(prevForm => ({...prevForm, tags: tagsArray}));
+  }
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -194,6 +201,26 @@ export default function ApplicationForm({
             className="min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             placeholder="Add any notes here, e.g., referral name, job post URL, etc."
           ></textarea>
+        </div>
+
+        {/* Tags */}
+        <div>
+          <Label htmlFor="tags">
+            Tags
+          </Label>
+          <Input
+            type="text"
+            id="tags"
+            name="tags"
+            defaultValue={form.tags.join(", ")}
+            onBlur={handleTagsChange} // Use onBlur to update state when user leaves the field
+            placeholder="e.g., remote, senior, fintech"
+          />
+          <div className="mt-2 flex flex-wrap gap-2">
+            {form.tags.map((tag, index) => (
+              <Badge key={index} variant="secondary">{tag}</Badge>
+            ))}
+          </div>
         </div>
 
         {/* Error Message */}
