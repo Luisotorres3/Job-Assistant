@@ -76,7 +76,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       <div className="flex flex-wrap justify-between items-center gap-4">
-        <h1 className="text-4xl font-extrabold text-gray-800 dark:text-white tracking-tight">
+        <h1 className="text-4xl font-extrabold text-black dark:text-white tracking-tight">
           Job Application Dashboard
         </h1>
         <Link
