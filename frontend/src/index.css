@@ -35,6 +35,20 @@
     --ring: 240 60% 50%;
 
     --radius: 0.5rem;
+
+    /* Badge Status Colors */
+    --badge-applied-bg: theme('colors.yellow.100');
+    --badge-applied-text: theme('colors.yellow.800');
+    --badge-applied-border: theme('colors.yellow.200');
+    --badge-interview-bg: theme('colors.blue.100');
+    --badge-interview-text: theme('colors.blue.800');
+    --badge-interview-border: theme('colors.blue.200');
+    --badge-offer-bg: theme('colors.green.100');
+    --badge-offer-text: theme('colors.green.800');
+    --badge-offer-border: theme('colors.green.200');
+    --badge-rejected-bg: theme('colors.red.100');
+    --badge-rejected-text: theme('colors.red.800');
+    --badge-rejected-border: theme('colors.red.200');
   }
 
   .dark {
@@ -68,6 +82,20 @@
     --border: 217.2 32.6% 20%;
     --input: 217.2 32.6% 20%;
     --ring: 240 60% 50%;
+
+    /* Dark Badge Status Colors */
+    --badge-applied-bg: theme('colors.yellow.900' / 0.2);
+    --badge-applied-text: theme('colors.yellow.400');
+    --badge-applied-border: theme('colors.yellow.800');
+    --badge-interview-bg: theme('colors.blue.900' / 0.2);
+    --badge-interview-text: theme('colors.blue.400');
+    --badge-interview-border: theme('colors.blue.800');
+    --badge-offer-bg: theme('colors.green.900' / 0.2);
+    --badge-offer-text: theme('colors.green.400');
+    --badge-offer-border: theme('colors.green.800');
+    --badge-rejected-bg: theme('colors.red.900' / 0.2);
+    --badge-rejected-text: theme('colors.red.400');
+    --badge-rejected-border: theme('colors.red.800');
   }
 
   * {

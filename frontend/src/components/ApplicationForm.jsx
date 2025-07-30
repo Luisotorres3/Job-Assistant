@@ -7,7 +7,10 @@ import {
   Calendar,
   CheckCircle,
   Briefcase,
+  Link2,
+  Bell,
 } from "lucide-react";
+import Badge from "./Badge";
 
 const statusOptions = [
   { value: "applied", label: "Applied", icon: "📝" },
@@ -30,13 +33,15 @@ export default function ApplicationForm({
     status: initialData.status || "applied",
     date_applied:
       initialData.date_applied || new Date().toISOString().split("T")[0],
+    next_step_date: initialData.next_step_date || "",
+    link: initialData.link || "",
     notes: initialData.notes || "",
     tags: initialData.tags || [],
   });
 
   function handleTagsChange(e) {
     // Assuming tags are comma-separated
-    const tagsArray = e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag);
+    const tagsArray = e.target.value.split(',').map(tag => tag.trim()).filter(Boolean);
     setForm(prevForm => ({...prevForm, tags: tagsArray}));
   }
 
@@ -149,6 +154,22 @@ export default function ApplicationForm({
           />
         </div>
 
+        {/* Job Link */}
+        <div>
+          <Label htmlFor="link">
+            <Link2 size={16} />
+            Job Post Link
+          </Label>
+          <Input
+            type="url"
+            id="link"
+            name="link"
+            value={form.link}
+            onChange={handleChange}
+            placeholder="https://company.com/careers/job-id"
+          />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Status */}
           <div>
@@ -187,6 +208,21 @@ export default function ApplicationForm({
           </div>
         </div>
 
+        {/* Next Step Date */}
+        <div>
+          <Label htmlFor="next_step_date">
+            <Bell size={16} />
+            Next Step Date (Optional)
+          </Label>
+          <Input
+            type="date"
+            id="next_step_date"
+            name="next_step_date"
+            value={form.next_step_date}
+            onChange={handleChange}
+          />
+        </div>
+
         {/* Notes */}
         <div>
           <Label htmlFor="notes">
@@ -217,7 +253,7 @@ export default function ApplicationForm({
             placeholder="e.g., remote, senior, fintech"
           />
           <div className="mt-2 flex flex-wrap gap-2">
-            {form.tags.map((tag, index) => (
+            {form.tags && form.tags.map((tag, index) => (
               <Badge key={index} variant="secondary">{tag}</Badge>
             ))}
           </div>

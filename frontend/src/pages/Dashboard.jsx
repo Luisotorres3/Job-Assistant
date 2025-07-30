@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import {
   fetchApplications,
   deleteApplication,
+  updateApplication,
 } from "../api/api";
 import ApplicationTable from "../components/ApplicationTable";
 import StatCard from "../components/StatCard";
@@ -41,9 +42,6 @@ const DashboardLoadingSkeleton = () => (
       <Skeleton className="h-12 w-40 rounded-lg" />
     </div>
 
-    {/* Filter Skeleton */}
-    <Skeleton className="h-20 w-full rounded-lg" />
-
     {/* Stats Skeleton */}
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <Skeleton className="h-28 rounded-xl" />
@@ -55,7 +53,7 @@ const DashboardLoadingSkeleton = () => (
      {/* Table Skeleton */}
     <div className="bg-card border rounded-xl shadow-sm">
       <div className="px-6 py-4 border-b">
-        <Skeleton className="h-6 w-48" />
+        <Skeleton className="h-8 w-full" />
       </div>
       <div className="p-6 space-y-4">
         <Skeleton className="h-12 w-full" />
@@ -78,6 +76,11 @@ export default function Dashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [sortBy, setSortBy] = useState("date_desc");
+  const [pinned, setPinned] = useState(() => new Set(JSON.parse(localStorage.getItem('pinnedApps') || '[]')));
+
+  useEffect(() => {
+    localStorage.setItem('pinnedApps', JSON.stringify([...pinned]));
+  }, [pinned]);
 
   useEffect(() => {
     setLoading(true);
@@ -107,6 +110,11 @@ export default function Dashboard() {
         return searchMatch && statusMatch;
       })
       .sort((a, b) => {
+        // Pinned items first
+        const aIsPinned = pinned.has(a.id);
+        const bIsPinned = pinned.has(b.id);
+        if (aIsPinned !== bIsPinned) return aIsPinned ? -1 : 1;
+
         switch (sortBy) {
           case 'date_asc':
             return new Date(a.date_applied) - new Date(b.date_applied);
@@ -144,10 +152,35 @@ export default function Dashboard() {
     }
   };
 
+  const handleStatusUpdate = async (app, newStatus) => {
+    const originalApplications = [...applications];
+    // Optimistic update
+    setApplications(prev => prev.map(a => a.id === app.id ? {...a, status: newStatus} : a));
+
+    try {
+      await updateApplication(app.id, { status: newStatus });
+    } catch (err) {
+      setError(err.message || "Failed to update status. Reverting changes.");
+      setApplications(originalApplications); // Revert on error
+    }
+  };
+
+  const handlePinToggle = (appId) => {
+    setPinned(prevPinned => {
+      const newPinned = new Set(prevPinned);
+      if (newPinned.has(appId)) {
+        newPinned.delete(appId);
+      } else {
+        newPinned.add(appId);
+      }
+      return newPinned;
+    });
+  };
+
   if (loading) return <DashboardLoadingSkeleton />;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -166,44 +199,6 @@ export default function Dashboard() {
           Add Application
         </Link>
       </div>
-
-      {/* Filter and Sort Controls */}
-      <div className="bg-card p-4 rounded-lg border shadow-sm flex flex-col md:flex-row gap-4">
-        <div className="relative flex-grow">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search by company or role..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full h-10 pl-10 pr-4 rounded-md border border-input bg-background text-sm focus:ring-ring focus:ring-1 focus:outline-none"
-          />
-        </div>
-        <div className="flex items-center gap-4">
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="h-10 rounded-md border border-input bg-background text-sm focus:ring-ring focus:ring-1 focus:outline-none"
-          >
-            <option value="all">All Statuses</option>
-            <option value="applied">Applied</option>
-            <option value="interview">Interview</option>
-            <option value="offer">Offer</option>
-            <option value="rejected">Rejected</option>
-          </select>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="h-10 rounded-md border border-input bg-background text-sm focus:ring-ring focus:ring-1 focus:outline-none"
-          >
-            <option value="date_desc">Sort by Date (Newest)</option>
-            <option value="date_asc">Sort by Date (Oldest)</option>
-            <option value="company_asc">Sort by Company (A-Z)</option>
-            <option value="company_desc">Sort by Company (Z-A)</option>
-          </select>
-        </div>
-      </div>
-
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -234,7 +229,7 @@ export default function Dashboard() {
       </div>
 
       {/* Content Area */}
-      <div className="mt-8">
+      <div className="mt-6">
         {error && (
            <div className="text-center py-12 bg-destructive/10 rounded-lg border border-destructive/20">
               <p className="font-bold text-destructive">Error</p>
@@ -244,18 +239,56 @@ export default function Dashboard() {
 
         {!error && applications.length > 0 && (
           <div className="bg-card border rounded-xl shadow-sm">
-            <div className="px-6 py-4 border-b flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-card-foreground">
-                Recent Applications
+            <div className="px-6 py-4 border-b flex flex-col md:flex-row items-center gap-4">
+              <h2 className="text-xl font-semibold text-card-foreground flex-shrink-0">
+                Recent Applications ({filteredApplications.length})
               </h2>
-              <span className="text-sm text-muted-foreground">{filteredApplications.length} results</span>
+               {/* Filter and Sort Controls */}
+              <div className="flex-grow flex flex-col md:flex-row items-center gap-4 w-full">
+                <div className="relative flex-grow w-full">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <input
+                    type="text"
+                    placeholder="Search by company or role..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full h-10 pl-10 pr-4 rounded-md border border-input bg-background text-sm focus:ring-ring focus:ring-1 focus:outline-none"
+                  />
+                </div>
+                <div className="flex items-center gap-4">
+                  <select
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    className="h-10 rounded-md border border-input bg-background text-sm focus:ring-ring focus:ring-1 focus:outline-none"
+                  >
+                    <option value="all">All Statuses</option>
+                    <option value="applied">Applied</option>
+                    <option value="interview">Interview</option>
+                    <option value="offer">Offer</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="h-10 rounded-md border border-input bg-background text-sm focus:ring-ring focus:ring-1 focus:outline-none"
+                  >
+                    <option value="date_desc">Sort by Date (Newest)</option>
+                    <option value="date_asc">Sort by Date (Oldest)</option>
+                    <option value="company_asc">Sort by Company (A-Z)</option>
+                    <option value="company_desc">Sort by Company (Z-A)</option>
+                  </select>
+                </div>
+              </div>
             </div>
-            <div className="p-6">
+            <div className="p-6 h-[calc(100vh-420px)] overflow-y-auto">
               <ApplicationTable
                 applications={filteredApplications}
+                pinned={pinned}
                 onView={handleView}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onStatusUpdate={handleStatusUpdate}
+                onPinToggle={handlePinToggle}
               />
             </div>
           </div>
