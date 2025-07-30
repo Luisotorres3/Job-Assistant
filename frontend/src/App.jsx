@@ -1,7 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import NewApplication from "./pages/NewApplication";
+
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 
 export default function App() {
   return (
@@ -13,6 +15,8 @@ export default function App() {
           <Route path="/new" element={<NewApplication />} />
         </Routes>
       </main>
+
+      <Footer />
     </div>
   );
 }

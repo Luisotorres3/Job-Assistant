@@ -3,8 +3,8 @@
 
 from fastapi import FastAPI, Depends, HTTPException, status, Body
 from sqlalchemy.orm import Session
-from . import models, schemas, crud, database, config
-from .ai.cover_letter_agent import generate_cover_letter
+from backend import models, schemas, crud, database, config
+from backend.ai.cover_letter_agent import generate_cover_letter
 
 # Create tables if they don't exist
 models.Base.metadata.create_all(bind=database.engine)

@@ -1,12 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { fetchApplications } from "../api/api";
 import ApplicationTable from "../components/ApplicationTable";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 export default function Dashboard() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  // Funciones para los botones
+  const handleView = (app) => {
+    navigate(`/application/${app.id}`);
+  };
+  const handleEdit = (app) => {
+    navigate(`/edit/${app.id}`);
+  };
+  const handleDelete = (app) => {
+    if (window.confirm("¿Seguro que deseas borrar esta aplicación?")) {
+      setApplications((prev) => prev.filter((a) => a.id !== app.id));
+      // Aquí puedes llamar a la API para borrar realmente
+    }
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -42,7 +58,12 @@ export default function Dashboard() {
           </div>
         )}
         {!loading && !error && (
-          <ApplicationTable applications={applications} />
+          <ApplicationTable
+            applications={applications}
+            onView={handleView}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
         )}
       </div>
     </div>

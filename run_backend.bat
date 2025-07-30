@@ -1,3 +1,4 @@
 @echo off
-REM Run FastAPI backend from project root with correct import paths
-uvicorn backend.main:app --reload
+cd /d "%~dp0"
+call .venv\Scripts\activate
+python -m uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000

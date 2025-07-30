@@ -1,0 +1,11 @@
+{
+  "name": "job-assistant",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "concurrently \"npm --prefix frontend run dev\" \"cmd /c run_backend.bat\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
