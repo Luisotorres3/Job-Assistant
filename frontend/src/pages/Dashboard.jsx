@@ -5,8 +5,31 @@ import {
   deleteApplication,
 } from "../api/api";
 import ApplicationTable from "../components/ApplicationTable";
+import StatCard from "../components/StatCard";
 import { Link, useNavigate } from "react-router-dom";
-import { PlusCircle, BarChart3, Users, Clock, CheckCircle } from "lucide-react";
+import { PlusCircle, BarChart3, Users, Clock, CheckCircle, FileText } from "lucide-react";
+
+const EmptyState = () => (
+    <div className="text-center py-16 px-6 bg-muted/50 rounded-lg border-2 border-dashed">
+      <div className="inline-flex items-center justify-center w-16 h-16 bg-background rounded-full mb-4 shadow-sm">
+        <FileText size={32} className="text-muted-foreground" />
+      </div>
+      <h3 className="text-xl font-semibold text-foreground mb-2">
+        No Applications Yet
+      </h3>
+      <p className="text-muted-foreground max-w-md mx-auto mb-6">
+        It looks like you haven't added any job applications. Let's get started!
+      </p>
+      <Link
+        to="/new"
+        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium rounded-lg text-primary-foreground bg-primary hover:bg-primary/90 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
+      >
+        <PlusCircle size={18} />
+        Add Your First Application
+      </Link>
+    </div>
+);
+
 
 export default function Dashboard() {
   const [applications, setApplications] = useState([]);
@@ -57,27 +80,6 @@ export default function Dashboard() {
     offers: applications.filter((app) => app.status === "offer").length,
   };
 
-  const StatCard = ({ icon: Icon, title, value, color }) => (
-    <div
-      className="bg-header border border-zinc-200 rounded-xl shadow p-6 transition-all duration-300 hover:shadow-md
-      dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-100 text-zinc-900"
-    >
-      <div className="flex items-center">
-        <div className={`p-3 rounded-lg ${color} shadow-sm`}>
-          <Icon size={24} className="text-white" />
-        </div>
-        <div className="ml-4">
-          <p className="text-sm font-medium text-zinc-500 dark:text-muted-foreground">
-            {title}
-          </p>
-          <p className="text-2xl font-bold text-inherit text-foreground dark:text-foreground">
-            {value}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -92,7 +94,7 @@ export default function Dashboard() {
         </div>
         <Link
           to="/new"
-          className="inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-medium rounded-lg text-primary-foreground bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-background"
+          className="inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-medium rounded-lg text-primary-foreground bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
         >
           <PlusCircle size={20} />
           Add Application
@@ -127,42 +129,45 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Table */}
-      <div
-        className="bg-background border border-zinc-200 rounded-xl shadow-sm transition-colors duration-300
-         dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-100 text-zinc-900"
-      >
-        <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 dark:bg-background">
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-gray-600">
-            Recent Applications
-          </h2>
-        </div>
-        <div className="p-6">
-          {loading && (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      {/* Content Area */}
+      <div className="mt-8">
+        {loading && (
+           <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               <p className="mt-4 text-muted-foreground font-medium">
                 Loading Applications...
               </p>
             </div>
-          )}
+        )}
 
-          {error && (
-            <div className="text-center py-12 bg-red-100 dark:bg-red-900/20 rounded-lg border border-red-300 dark:border-red-800">
-              <p className="font-bold text-red-600 dark:text-red-400">Error</p>
-              <p className="text-red-500 dark:text-red-300 mt-1">{error}</p>
+        {error && (
+           <div className="text-center py-12 bg-destructive/10 rounded-lg border border-destructive/20">
+              <p className="font-bold text-destructive">Error</p>
+              <p className="text-destructive/80 mt-1">{error}</p>
             </div>
-          )}
+        )}
 
-          {!loading && !error && (
-            <ApplicationTable
-              applications={applications}
-              onView={handleView}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
-          )}
-        </div>
+        {!loading && !error && applications.length > 0 && (
+          <div className="bg-card border rounded-xl shadow-sm">
+            <div className="px-6 py-4 border-b">
+              <h2 className="text-xl font-semibold text-card-foreground">
+                Recent Applications
+              </h2>
+            </div>
+            <div className="p-6">
+              <ApplicationTable
+                applications={applications}
+                onView={handleView}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            </div>
+          </div>
+        )}
+
+        {!loading && !error && applications.length === 0 && (
+          <EmptyState />
+        )}
       </div>
     </div>
   );
