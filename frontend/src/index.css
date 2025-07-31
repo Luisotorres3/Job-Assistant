@@ -1,3 +1,4 @@
+@config "../tailwind.config.js";
 @import "tailwindcss";
 
 @layer base {
@@ -34,6 +35,20 @@
     --ring: 240 60% 50%;
 
     --radius: 0.5rem;
+
+    /* Badge Status Colors */
+    --badge-applied-bg: #fef9c3;
+    --badge-applied-text: #854d0e;
+    --badge-applied-border: #fef08a;
+    --badge-interview-bg: #dbeafe;
+    --badge-interview-text: #1e40af;
+    --badge-interview-border: #bfdbfe;
+    --badge-offer-bg: #dcfce7;
+    --badge-offer-text: #166534;
+    --badge-offer-border: #bbf7d0;
+    --badge-rejected-bg: #fee2e2;
+    --badge-rejected-text: #991b1b;
+    --badge-rejected-border: #fecaca;
   }
 
   .dark {
@@ -67,6 +82,20 @@
     --border: 217.2 32.6% 20%;
     --input: 217.2 32.6% 20%;
     --ring: 240 60% 50%;
+
+    /* Dark Badge Status Colors */
+    --badge-applied-bg: rgba(113, 63, 18, 0.2);
+    --badge-applied-text: #facc15;
+    --badge-applied-border: #854d0e;
+    --badge-interview-bg: rgba(30, 58, 138, 0.2);
+    --badge-interview-text: #60a5fa;
+    --badge-interview-border: #1e3a8a;
+    --badge-offer-bg: rgba(22, 101, 52, 0.2);
+    --badge-offer-text: #4ade80;
+    --badge-offer-border: #166534;
+    --badge-rejected-bg: rgba(153, 27, 27, 0.2);
+    --badge-rejected-text: #f87171;
+    --badge-rejected-border: #991b1b;
   }
 
   * {
@@ -130,47 +159,5 @@
   .dark ::selection {
     background-color: theme("colors.blue.800");
     color: theme("colors.blue.100");
-  }
-}
-
-@layer utilities {
-  .bg-zinc-900 {
-    background-color: #18181b !important;
-  }
-  .text-zinc-100 {
-    color: #f4f4f5 !important;
-  }
-  .border-zinc-800 {
-    border-color: #27272a !important;
-  }
-}
-
-@layer utilities {
-  .bg-background {
-    background-color: hsl(var(--background));
-  }
-
-  .bg-header {
-    background-color: hsl(var(--header));
-  }
-
-  .text-header-foreground {
-    color: hsl(var(--header-foreground));
-  }
-
-  .bg-footer {
-    background-color: hsl(var(--footer));
-  }
-
-  .text-footer-foreground {
-    color: hsl(var(--footer-foreground));
-  }
-
-  .text-foreground {
-    color: hsl(var(--foreground));
-  }
-
-  .border-border {
-    border-color: hsl(var(--border));
   }
 }

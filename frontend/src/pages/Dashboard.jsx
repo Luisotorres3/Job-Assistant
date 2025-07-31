@@ -1,12 +1,69 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   fetchApplications,
-  fetchApplication,
   deleteApplication,
 } from "../api/api";
 import ApplicationTable from "../components/ApplicationTable";
+import StatCard from "../components/StatCard";
+import Skeleton from "../components/Skeleton";
 import { Link, useNavigate } from "react-router-dom";
-import { PlusCircle, BarChart3, Users, Clock, CheckCircle } from "lucide-react";
+import { PlusCircle, BarChart3, Users, Clock, CheckCircle, FileText, Search } from "lucide-react";
+
+const EmptyState = () => (
+    <div className="text-center py-16 px-6 bg-muted/50 rounded-lg border-2 border-dashed">
+      <div className="inline-flex items-center justify-center w-16 h-16 bg-background rounded-full mb-4 shadow-sm">
+        <FileText size={32} className="text-muted-foreground" />
+      </div>
+      <h3 className="text-xl font-semibold text-foreground mb-2">
+        No Applications Yet
+      </h3>
+      <p className="text-muted-foreground max-w-md mx-auto mb-6">
+        It looks like you haven't added any job applications. Let's get started!
+      </p>
+      <Link
+        to="/new"
+        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium rounded-lg text-primary-foreground bg-primary hover:bg-primary/90 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
+      >
+        <PlusCircle size={18} />
+        Add Your First Application
+      </Link>
+    </div>
+);
+
+const DashboardLoadingSkeleton = () => (
+  <div className="space-y-8">
+    {/* Header Skeleton */}
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <Skeleton className="h-10 w-64 mb-2" />
+        <Skeleton className="h-4 w-80" />
+      </div>
+      <Skeleton className="h-12 w-40 rounded-lg" />
+    </div>
+
+    {/* Stats Skeleton */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <Skeleton className="h-28 rounded-xl" />
+      <Skeleton className="h-28 rounded-xl" />
+      <Skeleton className="h-28 rounded-xl" />
+      <Skeleton className="h-28 rounded-xl" />
+    </div>
+
+     {/* Table Skeleton */}
+    <div className="bg-card border rounded-xl shadow-sm">
+      <div className="px-6 py-4 border-b">
+        <Skeleton className="h-8 w-full" />
+      </div>
+      <div className="p-6 space-y-4">
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-12 w-full" />
+      </div>
+    </div>
+  </div>
+);
+
 
 export default function Dashboard() {
   const [applications, setApplications] = useState([]);
@@ -14,7 +71,15 @@ export default function Dashboard() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Remove mockApplications, use real API
+  // Filter and sort state
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [sortBy, setSortBy] = useState("date_desc");
+  const [pinned, setPinned] = useState(() => new Set(JSON.parse(localStorage.getItem('pinnedApps') || '[]')));
+
+  useEffect(() => {
+    localStorage.setItem('pinnedApps', JSON.stringify([...pinned]));
+  }, [pinned]);
 
   useEffect(() => {
     setLoading(true);
@@ -28,58 +93,80 @@ export default function Dashboard() {
         setLoading(false);
       });
   }, []);
-  // Handlers for actions
-  const handleView = (app) => {
-    navigate(`/applications/${app.id}`);
-  };
 
-  const handleEdit = (app) => {
-    navigate(`/applications/${app.id}/edit`);
-  };
+  const filteredApplications = useMemo(() => {
+    return applications
+      .filter(app => {
+        // Search term filter
+        const term = searchTerm.toLowerCase();
+        const inCompany = app.company.toLowerCase().includes(term);
+        const inRole = app.role.toLowerCase().includes(term);
+        const searchMatch = !term || inCompany || inRole;
 
+        // Status filter
+        const statusMatch = filterStatus === 'all' || app.status === filterStatus;
+
+        return searchMatch && statusMatch;
+      })
+      .sort((a, b) => {
+        // Pinned items first
+        const aIsPinned = pinned.has(a.id);
+        const bIsPinned = pinned.has(b.id);
+        if (aIsPinned !== bIsPinned) return aIsPinned ? -1 : 1;
+
+        switch (sortBy) {
+          case 'date_asc':
+            return new Date(a.date_applied) - new Date(b.date_applied);
+          case 'date_desc':
+            return new Date(b.date_applied) - new Date(a.date_applied);
+          case 'company_asc':
+            return a.company.localeCompare(b.company);
+          case 'company_desc':
+            return b.company.localeCompare(a.company);
+          default:
+            return 0;
+        }
+      });
+  }, [applications, searchTerm, filterStatus, sortBy, pinned]);
+
+  const stats = useMemo(() => ({
+    total: filteredApplications.length,
+    applied: filteredApplications.filter((app) => app.status === "applied").length,
+    interview: filteredApplications.filter((app) => app.status === "interview").length,
+    offers: filteredApplications.filter((app) => app.status === "offer").length,
+  }), [filteredApplications]);
+
+  const handleView = (app) => navigate(`/applications/${app.id}`);
+  const handleEdit = (app) => navigate(`/applications/${app.id}/edit`);
   const handleDelete = async (app) => {
-    setLoading(true);
-    setError(null);
+    // Optimistic UI update
+    const originalApplications = [...applications];
+    setApplications(prev => prev.filter(a => a.id !== app.id));
+
     try {
       await deleteApplication(app.id);
-      setApplications((prev) => prev.filter((a) => a.id !== app.id));
     } catch (err) {
-      setError(err.message || "Failed to delete application");
-    } finally {
-      setLoading(false);
+      setError(err.message || "Failed to delete application. Reverting changes.");
+      setApplications(originalApplications); // Revert on error
     }
   };
 
-  const stats = {
-    total: applications.length,
-    applied: applications.filter((app) => app.status === "applied").length,
-    interview: applications.filter((app) => app.status === "interview").length,
-    offers: applications.filter((app) => app.status === "offer").length,
+  const handlePinToggle = (appId) => {
+    setPinned(prevPinned => {
+      const newPinned = new Set(prevPinned);
+      if (newPinned.has(appId)) {
+        newPinned.delete(appId);
+      } else {
+        newPinned.add(appId);
+      }
+      return newPinned;
+    });
   };
 
-  const StatCard = ({ icon: Icon, title, value, color }) => (
-    <div
-      className="bg-header border border-zinc-200 rounded-xl shadow p-6 transition-all duration-300 hover:shadow-md
-      dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-100 text-zinc-900"
-    >
-      <div className="flex items-center">
-        <div className={`p-3 rounded-lg ${color} shadow-sm`}>
-          <Icon size={24} className="text-white" />
-        </div>
-        <div className="ml-4">
-          <p className="text-sm font-medium text-zinc-500 dark:text-muted-foreground">
-            {title}
-          </p>
-          <p className="text-2xl font-bold text-inherit text-foreground dark:text-foreground">
-            {value}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
+  if (loading) return <DashboardLoadingSkeleton />;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -92,7 +179,7 @@ export default function Dashboard() {
         </div>
         <Link
           to="/new"
-          className="inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-medium rounded-lg text-primary-foreground bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-background"
+          className="inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-medium rounded-lg text-primary-foreground bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
         >
           <PlusCircle size={20} />
           Add Application
@@ -127,42 +214,74 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Table */}
-      <div
-        className="bg-background border border-zinc-200 rounded-xl shadow-sm transition-colors duration-300
-         dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-100 text-zinc-900"
-      >
-        <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 dark:bg-background">
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-gray-600">
-            Recent Applications
-          </h2>
-        </div>
-        <div className="p-6">
-          {loading && (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="mt-4 text-muted-foreground font-medium">
-                Loading Applications...
-              </p>
+      {/* Content Area */}
+      <div className="mt-6">
+        {error && (
+           <div className="text-center py-12 bg-destructive/10 rounded-lg border border-destructive/20">
+              <p className="font-bold text-destructive">Error</p>
+              <p className="text-destructive/80 mt-1">{error}</p>
             </div>
-          )}
+        )}
 
-          {error && (
-            <div className="text-center py-12 bg-red-100 dark:bg-red-900/20 rounded-lg border border-red-300 dark:border-red-800">
-              <p className="font-bold text-red-600 dark:text-red-400">Error</p>
-              <p className="text-red-500 dark:text-red-300 mt-1">{error}</p>
+        {!error && applications.length > 0 && (
+          <div className="bg-card border rounded-xl shadow-sm">
+            <div className="px-6 py-4 border-b flex flex-col md:flex-row items-center gap-4">
+              <h2 className="text-xl font-semibold text-card-foreground flex-shrink-0">
+                Recent Applications ({filteredApplications.length})
+              </h2>
+               {/* Filter and Sort Controls */}
+              <div className="flex-grow flex flex-col md:flex-row items-center gap-4 w-full">
+                <div className="relative flex-grow w-full">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <input
+                    type="text"
+                    placeholder="Search by company or role..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full h-10 pl-10 pr-4 rounded-md border border-input bg-background text-sm focus:ring-ring focus:ring-1 focus:outline-none"
+                  />
+                </div>
+                <div className="flex items-center gap-4">
+                  <select
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    className="h-10 rounded-md border border-input bg-background text-sm focus:ring-ring focus:ring-1 focus:outline-none"
+                  >
+                    <option value="all">All Statuses</option>
+                    <option value="applied">Applied</option>
+                    <option value="interview">Interview</option>
+                    <option value="offer">Offer</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="h-10 rounded-md border border-input bg-background text-sm focus:ring-ring focus:ring-1 focus:outline-none"
+                  >
+                    <option value="date_desc">Sort by Date (Newest)</option>
+                    <option value="date_asc">Sort by Date (Oldest)</option>
+                    <option value="company_asc">Sort by Company (A-Z)</option>
+                    <option value="company_desc">Sort by Company (Z-A)</option>
+                  </select>
+                </div>
+              </div>
             </div>
-          )}
+            <div className="p-6 h-[calc(100vh-420px)] overflow-y-auto">
+              <ApplicationTable
+                applications={filteredApplications}
+                pinned={pinned}
+                onView={handleView}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onPinToggle={handlePinToggle}
+              />
+            </div>
+          </div>
+        )}
 
-          {!loading && !error && (
-            <ApplicationTable
-              applications={applications}
-              onView={handleView}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
-          )}
-        </div>
+        {!error && applications.length === 0 && !loading && (
+          <EmptyState />
+        )}
       </div>
     </div>
   );
