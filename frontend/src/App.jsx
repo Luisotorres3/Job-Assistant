@@ -3,6 +3,7 @@ import Dashboard from "./pages/Dashboard";
 import NewApplication from "./pages/NewApplication";
 import ViewApplication from "./pages/ViewApplication";
 import EditApplication from "./pages/EditApplication";
+import Insights from "./pages/Insights";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { useEffect, useState } from "react";
@@ -40,6 +41,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/new" element={<NewApplication />} />
+          <Route path="/insights" element={<Insights />} />
           <Route path="/applications/:id" element={<ViewApplication />} />
           <Route path="/applications/:id/edit" element={<EditApplication />} />
         </Routes>

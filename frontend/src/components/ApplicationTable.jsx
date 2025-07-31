@@ -2,45 +2,6 @@ import React from "react";
 import { Eye, Edit, Trash2, Building, MapPin, Calendar, Bell, Pin, ExternalLink } from "lucide-react";
 import Badge from "./Badge";
 
-const statusOptions = [
-  { value: "applied", label: "Applied" },
-  { value: "interview", label: "Interview" },
-  { value: "offer", label: "Offer" },
-  { value: "rejected", label: "Rejected" },
-];
-
-const StatusSelect = ({ app, onStatusUpdate }) => {
-  const { status } = app;
-  const badgeClasses = "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2";
-
-  return (
-    <div className="relative">
-      <select
-        value={status}
-        onChange={(e) => onStatusUpdate(app, e.target.value)}
-        className={`${badgeClasses} appearance-none w-full pr-8 cursor-pointer bg-transparent`}
-        style={{
-          color: `var(--badge-${status}-text)`,
-          borderColor: `var(--badge-${status}-border)`,
-        }}
-      >
-        {statusOptions.map(opt => (
-          <option key={opt.value} value={opt.value} style={{color: 'initial', backgroundColor: 'initial'}}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
-       <div
-        className={`absolute inset-0 -z-10 rounded-md`}
-        style={{ backgroundColor: `var(--badge-${status}-bg)`}}
-      />
-      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-current">
-        <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
-      </div>
-    </div>
-  );
-};
-
 const NextStepDate = ({ date }) => {
   if (!date) return <span className="text-muted-foreground/50">N/A</span>;
 
@@ -71,18 +32,23 @@ export default function ApplicationTable({
   onView,
   onEdit,
   onDelete,
-  onStatusUpdate,
   onPinToggle,
 }) {
+
+  const handleActionClick = (e, action) => {
+    e.stopPropagation();
+    action();
+  }
+
   return (
     <>
       {/* Mobile Card View */}
       <div className="space-y-4 md:hidden">
         {applications.map((app) => (
-          <div key={app.id} className="bg-card border rounded-lg p-4 space-y-3 shadow-sm">
+          <div key={app.id} onClick={() => onView(app)} className="bg-card border rounded-lg p-4 space-y-3 shadow-sm cursor-pointer hover:border-primary/50 transition-all">
             <div className="flex justify-between items-start">
               <div className="flex items-center gap-2">
-                 <button onClick={() => onPinToggle(app.id)} className="p-1">
+                 <button onClick={(e) => handleActionClick(e, () => onPinToggle(app.id))} className="p-1">
                     <Pin size={16} className={`transition-colors ${pinned.has(app.id) ? 'fill-amber-400 text-amber-500' : 'text-muted-foreground hover:text-amber-400'}`} />
                   </button>
                 <div>
@@ -92,19 +58,19 @@ export default function ApplicationTable({
               </div>
               <div className="flex items-center space-x-1">
                  {app.link && (
-                  <a href={app.link} target="_blank" rel="noopener noreferrer" className="p-2 rounded-md hover:bg-muted text-muted-foreground" title="Open Job Link">
+                  <a href={app.link} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="p-2 rounded-md hover:bg-muted text-muted-foreground" title="Open Job Link">
                     <ExternalLink size={16} />
                   </a>
                 )}
                 <button
-                  onClick={() => onEdit && onEdit(app)}
+                  onClick={(e) => handleActionClick(e, () => onEdit && onEdit(app))}
                   className="p-2 rounded-md hover:bg-muted text-muted-foreground"
                   title="Edit"
                 >
                   <Edit size={16} />
                 </button>
                 <button
-                  onClick={() => onDelete && onDelete(app)}
+                  onClick={(e) => handleActionClick(e, () => onDelete && onDelete(app))}
                   className="p-2 rounded-md hover:bg-muted text-destructive"
                   title="Delete"
                 >
@@ -117,7 +83,9 @@ export default function ApplicationTable({
               {app.location}
             </div>
             <div className="flex justify-between items-center pt-2">
-              <StatusSelect app={app} onStatusUpdate={onStatusUpdate} />
+               <Badge status={app.status}>
+                {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
+              </Badge>
               <NextStepDate date={app.next_step_date} />
             </div>
           </div>
@@ -148,10 +116,11 @@ export default function ApplicationTable({
             {applications.map((app) => (
               <tr
                 key={app.id}
-                className={`transition-colors duration-200 group ${pinned.has(app.id) ? 'bg-amber-100/10' : 'hover:bg-muted/50'}`}
+                onClick={() => onView(app)}
+                className={`transition-colors duration-200 group cursor-pointer ${pinned.has(app.id) ? 'bg-amber-100/10' : 'hover:bg-muted/50'}`}
               >
                 <td className="px-2 py-4">
-                  <button onClick={() => onPinToggle(app.id)} className="p-2" title={pinned.has(app.id) ? 'Unpin' : 'Pin'}>
+                  <button onClick={(e) => handleActionClick(e, () => onPinToggle(app.id))} className="p-2" title={pinned.has(app.id) ? 'Unpin' : 'Pin'}>
                     <Pin size={16} className={`transition-all ${pinned.has(app.id) ? 'fill-amber-400 text-amber-500' : 'text-muted-foreground/50 group-hover:text-amber-400'}`} />
                   </button>
                 </td>
@@ -177,25 +146,20 @@ export default function ApplicationTable({
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <StatusSelect app={app} onStatusUpdate={onStatusUpdate} />
+                   <Badge status={app.status}>
+                    {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
+                  </Badge>
                 </td>
                 <td className="px-6 py-4">
                   <NextStepDate date={app.next_step_date} />
                 </td>
-                <td className="px-6 py-4">
+                <td onClick={(e) => e.stopPropagation()} className="px-6 py-4">
                   <div className="flex items-center space-x-1">
                      {app.link && (
                       <a href={app.link} target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg transition-all duration-200 text-muted-foreground hover:bg-muted" title="Open Job Link">
                         <ExternalLink size={16} />
                       </a>
                     )}
-                    <button
-                      className="p-2 rounded-lg transition-all duration-200 text-muted-foreground hover:bg-muted"
-                      title="View details"
-                      onClick={() => onView && onView(app)}
-                    >
-                      <Eye size={16} />
-                    </button>
                     <button
                       className="p-2 rounded-lg transition-all duration-200 text-muted-foreground hover:bg-muted"
                       title="Edit application"

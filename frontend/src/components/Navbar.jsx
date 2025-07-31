@@ -47,6 +47,7 @@ export default function Navbar({ darkMode, toggleDarkMode }) {
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center gap-2">
             <NavLinkItem to="/">Dashboard</NavLinkItem>
+            <NavLinkItem to="/insights">Insights</NavLinkItem>
             <NavLinkItem to="/new">New Application</NavLinkItem>
             {/* Dark mode toggle */}
             <div className="ml-2 pl-2 border-l border-border">
@@ -97,6 +98,7 @@ export default function Navbar({ darkMode, toggleDarkMode }) {
         {isMenuOpen && (
           <div className="md:hidden pb-4 space-y-2">
             <NavLinkItem to="/">Dashboard</NavLinkItem>
+            <NavLinkItem to="/insights">Insights</NavLinkItem>
             <NavLinkItem to="/new">New Application</NavLinkItem>
           </div>
         )}

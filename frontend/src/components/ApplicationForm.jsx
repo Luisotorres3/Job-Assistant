@@ -9,8 +9,10 @@ import {
   Briefcase,
   Link2,
   Bell,
+  X,
 } from "lucide-react";
 import Badge from "./Badge";
+import { useNavigate } from "react-router-dom";
 
 const statusOptions = [
   { value: "applied", label: "Applied", icon: "📝" },
@@ -26,6 +28,7 @@ export default function ApplicationForm({
   error,
   isEdit = false,
 }) {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     company: initialData.company || "",
     role: initialData.role || "",
@@ -270,24 +273,34 @@ export default function ApplicationForm({
           </div>
         )}
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-lg shadow-lg text-base font-semibold text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring dark:focus:ring-offset-gray-800 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200"
-        >
-          {loading ? (
-            <>
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-current"></div>
-              Submitting...
-            </>
-          ) : (
-            <>
-              <CheckCircle size={20} />
-              {isEdit ? "Save Changes" : "Submit Application"}
-            </>
-          )}
-        </button>
+        {/* Action Buttons */}
+        <div className="flex flex-col-reverse sm:flex-row gap-3">
+           <button
+            type="button"
+            onClick={() => navigate(-1)} // Go back to previous page
+            className="w-full flex justify-center items-center gap-2 py-3 px-4 border rounded-lg shadow-sm text-base font-semibold text-muted-foreground bg-background hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
+          >
+            <X size={20} />
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-lg shadow-lg text-base font-semibold text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring dark:focus:ring-offset-gray-800 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+          >
+            {loading ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-current"></div>
+                Submitting...
+              </>
+            ) : (
+              <>
+                <CheckCircle size={20} />
+                {isEdit ? "Save Changes" : "Submit Application"}
+              </>
+            )}
+          </button>
+        </div>
       </form>
     </div>
   );

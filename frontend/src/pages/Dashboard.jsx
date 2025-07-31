@@ -2,7 +2,6 @@ import React, { useEffect, useState, useMemo } from "react";
 import {
   fetchApplications,
   deleteApplication,
-  updateApplication,
 } from "../api/api";
 import ApplicationTable from "../components/ApplicationTable";
 import StatCard from "../components/StatCard";
@@ -128,7 +127,7 @@ export default function Dashboard() {
             return 0;
         }
       });
-  }, [applications, searchTerm, filterStatus, sortBy]);
+  }, [applications, searchTerm, filterStatus, sortBy, pinned]);
 
   const stats = useMemo(() => ({
     total: filteredApplications.length,
@@ -148,19 +147,6 @@ export default function Dashboard() {
       await deleteApplication(app.id);
     } catch (err) {
       setError(err.message || "Failed to delete application. Reverting changes.");
-      setApplications(originalApplications); // Revert on error
-    }
-  };
-
-  const handleStatusUpdate = async (app, newStatus) => {
-    const originalApplications = [...applications];
-    // Optimistic update
-    setApplications(prev => prev.map(a => a.id === app.id ? {...a, status: newStatus} : a));
-
-    try {
-      await updateApplication(app.id, { status: newStatus });
-    } catch (err) {
-      setError(err.message || "Failed to update status. Reverting changes.");
       setApplications(originalApplications); // Revert on error
     }
   };
@@ -287,7 +273,6 @@ export default function Dashboard() {
                 onView={handleView}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
-                onStatusUpdate={handleStatusUpdate}
                 onPinToggle={handlePinToggle}
               />
             </div>
